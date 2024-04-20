@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Game.h"
+#include "Player.h"
+#include "utils.h"
 
 Game::Game( const Window& window ) 
 	:BaseGame{ window }
@@ -14,53 +16,36 @@ Game::~Game( )
 
 void Game::Initialize( )
 {
-	
+	m_Player = new Player{};
 }
 
 void Game::Cleanup( )
 {
+	delete m_Player;
 }
 
 void Game::Update( float elapsedSec )
 {
-	// Check keyboard state
-	//const Uint8 *pStates = SDL_GetKeyboardState( nullptr );
-	//if ( pStates[SDL_SCANCODE_RIGHT] )
-	//{
-	//	std::cout << "Right arrow key is down\n";
-	//}
-	//if ( pStates[SDL_SCANCODE_LEFT] && pStates[SDL_SCANCODE_UP])
-	//{
-	//	std::cout << "Left and up arrow keys are down\n";
-	//}
+	m_Player->Update(elapsedSec);
 }
 
 void Game::Draw( ) const
 {
-	ClearBackground( );
+	ClearBackground();
+	utils::SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
+	utils::FillRect(Point2f{ -100.f, -100.f }, 2000.f, 2000.f);
+
+	m_Player->Draw();
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
 {
-	//std::cout << "KEYDOWN event: " << e.keysym.sym << std::endl;
+	m_Player->KeyDownEvent(e);
 }
 
 void Game::ProcessKeyUpEvent( const SDL_KeyboardEvent& e )
 {
-	//std::cout << "KEYUP event: " << e.keysym.sym << std::endl;
-	//switch ( e.keysym.sym )
-	//{
-	//case SDLK_LEFT:
-	//	//std::cout << "Left arrow key released\n";
-	//	break;
-	//case SDLK_RIGHT:
-	//	//std::cout << "`Right arrow key released\n";
-	//	break;
-	//case SDLK_1:
-	//case SDLK_KP_1:
-	//	//std::cout << "Key 1 released\n";
-	//	break;
-	//}
+	m_Player->KeyUpEvent(e);
 }
 
 void Game::ProcessMouseMotionEvent( const SDL_MouseMotionEvent& e )
