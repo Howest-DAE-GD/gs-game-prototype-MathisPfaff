@@ -33,7 +33,7 @@ void Game::Draw( ) const
 {
 	ClearBackground();
 	utils::SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
-	utils::FillRect(Point2f{ -100.f, -100.f }, 2000.f, 2000.f);
+	utils::FillRect(Point2f{ 100.f, 150.f }, 200.f, 200.f);
 
 	m_Player->Draw();
 }

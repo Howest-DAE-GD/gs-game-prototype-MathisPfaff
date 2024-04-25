@@ -23,6 +23,7 @@ private:
 	Point2f m_PositionSecond;
 	LR m_IsLooking;
 	Vector2f m_Speed;
+	bool m_Jump;
 
 };
 
