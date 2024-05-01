@@ -24,6 +24,9 @@ private:
 	LR m_IsLooking;
 	Vector2f m_Speed;
 	bool m_Jump;
+	int TakePoint;
+	static const int PREVIOUS_POINTS{500};
+	Point2f LastPositions[PREVIOUS_POINTS];
 
 };
 

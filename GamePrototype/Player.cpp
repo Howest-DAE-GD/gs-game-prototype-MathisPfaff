@@ -4,8 +4,8 @@
 #include <iostream>
 
 Player::Player() :
-	m_Speed{0.f, 0.f}, m_PositionFirst{200.f, 200.f}, m_PositionSecond{180.f, 200.f}, m_IsLooking{},
-	m_Jump{true}
+	m_Speed{ 0.f, 0.f }, m_PositionFirst{ 200.f, 200.f }, m_PositionSecond{ 180.f, 200.f }, m_IsLooking{},
+	m_Jump{ true }, TakePoint{0}
 {}
 Player::~Player()
 {}
@@ -20,13 +20,29 @@ void Player::Draw()
 }
 void Player::Update(float elapsedSec)
 {
+	if (TakePoint == 0)
+	{
+		for (int index{ PREVIOUS_POINTS - 1 }; index > 0; --index)
+		{
+			LastPositions[index] = LastPositions[index - 1];
+		}
+
+		LastPositions[0] = m_PositionFirst;
+		TakePoint = 2;
+	}
+	else
+	{
+		--TakePoint;
+	}
+	
+	
 	m_PositionFirst.x += m_Speed.x * elapsedSec;
 	
 
 	if (m_IsLooking == LR::Right)
 	{
 		float Xlength{ m_PositionFirst.x - 50 - m_PositionSecond.x };
-		m_PositionSecond.x += Xlength  * elapsedSec;
+		m_PositionSecond.x += Xlength  * elapsedSec * 2;
 	}
 	else if(m_IsLooking == LR::Left)
 	{
@@ -37,6 +53,9 @@ void Player::Update(float elapsedSec)
 	if (m_PositionFirst.y >= 200.f)
 	{
 		m_PositionFirst.y += m_Speed.y;
+
+		m_PositionSecond.y = LastPositions[2].y;
+		
 		m_Speed.y -= 9.f * elapsedSec;
 	}
 	else
@@ -45,6 +64,11 @@ void Player::Update(float elapsedSec)
 		m_Speed.y = 0.f;
 		m_Jump = true;
 	}
+
+	//if (m_PositionSecond.y < 200.f)
+	//{
+		//m_PositionSecond.y = 200.f;
+	//}
 	
 }
 
