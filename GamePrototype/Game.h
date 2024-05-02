@@ -24,6 +24,7 @@ public:
 
 private:
 	Player* m_Player{};
+	Point2f m_cameraPos{};
 
 	// FUNCTIONS
 	void Initialize();

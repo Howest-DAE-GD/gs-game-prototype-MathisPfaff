@@ -27,15 +27,23 @@ void Game::Cleanup( )
 void Game::Update( float elapsedSec )
 {
 	m_Player->Update(elapsedSec);
+	m_cameraPos = Point2f{ m_Player->GetPos().x - GetViewPort().width / 2, m_Player->GetPos().y - 200.f};
 }
 
 void Game::Draw( ) const
 {
 	ClearBackground();
-	utils::SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
-	utils::FillRect(Point2f{ 100.f, 150.f }, 200.f, 200.f);
 
-	m_Player->Draw();
+	glPushMatrix();
+	{
+		glTranslatef(-m_cameraPos.x, -m_cameraPos.y, 0);
+
+		utils::SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
+		utils::FillRect(Point2f{ 100.f, 150.f }, 200.f, 200.f);
+
+		m_Player->Draw();
+	}
+	glPopMatrix();
 }
 
 void Game::ProcessKeyDownEvent( const SDL_KeyboardEvent & e )
