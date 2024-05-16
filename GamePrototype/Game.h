@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseGame.h"
+#include <vector>
 class Player;
 class Game : public BaseGame
 {
@@ -25,6 +26,7 @@ public:
 private:
 	Player* m_Player{};
 	Point2f m_cameraPos{};
+	std::vector<std::vector<Point2f>> m_SolidHitboxes;
 
 	// FUNCTIONS
 	void Initialize();

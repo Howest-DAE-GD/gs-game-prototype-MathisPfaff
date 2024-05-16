@@ -2,6 +2,8 @@
 #include "Game.h"
 #include "Player.h"
 #include "utils.h"
+#include "SVGParser.h"
+#include <vector>
 
 Game::Game( const Window& window ) 
 	:BaseGame{ window }
@@ -17,6 +19,7 @@ Game::~Game( )
 void Game::Initialize( )
 {
 	m_Player = new Player{};
+	SVGParser::GetVerticesFromSvgFile("LevelTowerV3.svg", m_SolidHitboxes);
 }
 
 void Game::Cleanup( )
@@ -36,12 +39,17 @@ void Game::Draw( ) const
 
 	glPushMatrix();
 	{
-		glTranslatef(-m_cameraPos.x, -m_cameraPos.y, 0);
+		glTranslatef(0, -m_cameraPos.y, 0);
 
 		utils::SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
 		utils::FillRect(Point2f{ 100.f, 150.f }, 200.f, 200.f);
 
 		m_Player->Draw();
+
+		for (std::vector<Point2f> vector : m_SolidHitboxes)
+		{
+			utils::DrawPolygon(vector);
+		}
 	}
 	glPopMatrix();
 }
