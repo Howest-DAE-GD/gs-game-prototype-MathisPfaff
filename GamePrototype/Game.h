@@ -23,6 +23,8 @@ public:
 	void ProcessMouseDownEvent( const SDL_MouseButtonEvent& e ) override;
 	void ProcessMouseUpEvent( const SDL_MouseButtonEvent& e ) override;
 
+	float CheckHitFalling(const Rectf& given_hitbox, float speed);
+	float CheckHitWall(const Rectf& given_hitbox, float speed);
 private:
 	Player* m_Player{};
 	Point2f m_cameraPos{};

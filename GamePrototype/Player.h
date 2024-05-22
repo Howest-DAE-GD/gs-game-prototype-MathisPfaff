@@ -17,8 +17,13 @@ public:
 	void Update(float elapsedSec);
 	void KeyDownEvent(const SDL_KeyboardEvent& e);
 	void KeyUpEvent(const SDL_KeyboardEvent& e);
+	void HitX(float given_X);
+	void HitY(float given_Y);
 
 	Point2f GetPos();
+	Rectf GetHitbox();
+	bool Getdirection();
+	Vector2f GetSpeed();
 
 private:
 	Point2f m_PositionFirst;
@@ -31,6 +36,7 @@ private:
 	int TakePoint;
 	static const int PREVIOUS_POINTS{10};
 	Point2f LastPositions[PREVIOUS_POINTS];
-
+	Rectf m_Hitbox;
+	bool Falling;
 };
 

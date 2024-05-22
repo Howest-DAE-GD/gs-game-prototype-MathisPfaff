@@ -5,7 +5,7 @@
 
 Player::Player() :
 	m_Speed{ 400.f, 0.f }, m_PositionFirst{ 200.f, 200.f }, m_PositionSecond{ 180.f, 200.f }, m_IsLooking{LR::Right},
-	m_Jump{ true }, TakePoint{0}, Isleft{false}, IsRight{false}
+	m_Jump{ true }, TakePoint{0}, Isleft{false}, IsRight{false}, m_Hitbox{200.f, 200.f, 80.f, 80.f}, Falling{false}
 {}
 Player::~Player()
 {}
@@ -13,6 +13,7 @@ Player::~Player()
 
 void Player::Draw()
 {
+	utils::DrawRect(m_Hitbox);
 	utils::SetColor(Color4f{ 0.f, 0.776f, 1.f, 1.f });
 	utils::FillEllipse(m_PositionSecond.x, m_PositionSecond.y, 40.f, 40.f);
 	utils::SetColor(Color4f{ 0.133f, 0.776f, 0.267f, 1.f });
@@ -20,7 +21,10 @@ void Player::Draw()
 }
 void Player::Update(float elapsedSec)
 {
-	
+	m_PositionFirst.x = m_Hitbox.left + 40.f;
+	m_PositionFirst.y = m_Hitbox.bottom + 40.f;
+
+	//std::cout << m_Hitbox.left << "." << m_Hitbox.bottom << std::endl;
 	for (int index{ PREVIOUS_POINTS - 1 }; index > 0; --index)
 	{
 		LastPositions[index] = LastPositions[index - 1];
@@ -29,8 +33,16 @@ void Player::Update(float elapsedSec)
 	LastPositions[0] = m_PositionFirst;
 		
 	
-	if (Isleft) m_PositionFirst.x -= m_Speed.x * elapsedSec;
-	if (IsRight) m_PositionFirst.x += m_Speed.x * elapsedSec;
+	if (Isleft)
+	{
+		m_Speed.x = -400.f;
+		m_Hitbox.left += m_Speed.x * elapsedSec;
+	}
+	if (IsRight)
+	{
+		m_Speed.x = 400.f;
+		m_Hitbox.left += m_Speed.x * elapsedSec;
+	}
 	
 
 	if (m_IsLooking == LR::Right)
@@ -44,9 +56,9 @@ void Player::Update(float elapsedSec)
 		m_PositionSecond.x += Xlength * elapsedSec * 5;
 	}
 
-	if (m_PositionFirst.y >= 200.f)
+	if (Falling)
 	{
-		m_PositionFirst.y += m_Speed.y;
+		m_Hitbox.bottom += m_Speed.y;
 
 		m_PositionSecond.y = LastPositions[PREVIOUS_POINTS - 1].y;
 		
@@ -54,7 +66,7 @@ void Player::Update(float elapsedSec)
 	}
 	else
 	{
-		m_PositionFirst.y = 200.f;
+		m_PositionSecond.y = LastPositions[PREVIOUS_POINTS - 1].y;
 		m_Speed.y = 0.f;
 		m_Jump = true;
 	}
@@ -71,6 +83,7 @@ void Player::KeyDownEvent(const SDL_KeyboardEvent& e)
 		{
 			m_Speed.y = 5.f;
 			m_Jump = false;
+			Falling = true;
 		}
 		break;
 	case SDLK_a:
@@ -100,4 +113,49 @@ void Player::KeyUpEvent(const SDL_KeyboardEvent& e)
 Point2f Player::GetPos()
 {
 	return m_PositionFirst;
+}
+
+Rectf Player::GetHitbox()
+{
+	return m_Hitbox;
+}
+
+bool Player::Getdirection()
+{
+	return Isleft;
+}
+
+Vector2f Player::GetSpeed()
+{
+	return m_Speed;
+}
+
+void Player::HitX(float given_X)
+{
+	if (given_X != 0)
+	{
+		m_Hitbox.left = given_X;
+	}
+}
+void Player::HitY(float given_Y)
+{
+	if (given_Y != 0)
+	{
+		if (given_Y < 0)
+		{
+			m_Hitbox.bottom = -given_Y;
+			m_Speed.y = 0.f;
+		}
+		else
+		{
+			m_Hitbox.bottom = given_Y;
+			Falling = false;
+		}
+
+		
+	}
+	else
+	{
+		Falling = true;
+	}
 }
