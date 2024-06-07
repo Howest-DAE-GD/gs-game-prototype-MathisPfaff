@@ -86,6 +86,12 @@ void Player::Update(float elapsedSec)
 	
 	if (GhostActive) Cooldown -= elapsedSec;
 
+
+	if (m_Hitbox.bottom < -200.f)
+	{
+		m_Hitbox.bottom = 200.f;
+		m_Hitbox.left = 200.f;
+	}
 }
 
 
