@@ -4,8 +4,9 @@
 #include <iostream>
 
 Player::Player() :
-	m_Speed{ 400.f, 0.f }, m_PositionFirst{ 200.f, 200.f }, m_PositionSecond{ 180.f, 200.f }, m_IsLooking{LR::Right},
-	m_Jump{ true }, TakePoint{0}, Isleft{false}, IsRight{false}, m_Hitbox{200.f, 200.f, 80.f, 80.f}, Falling{false}
+	m_Speed{ 400.f, 0.f }, m_PositionFirst{ 200.f, 200.f }, m_PositionSecond{ 180.f, 200.f }, m_IsLooking{ LR::Right },
+	m_Jump{ true }, TakePoint{ 0 }, Isleft{ false }, IsRight{ false }, m_Hitbox{ 200.f, 200.f, 80.f, 80.f }, Falling{ false }, GhostActive{ false },
+	Cooldown{ 2.f }, doubleJump{ false }
 {}
 Player::~Player()
 {}
@@ -13,7 +14,7 @@ Player::~Player()
 
 void Player::Draw()
 {
-	utils::DrawRect(m_Hitbox);
+	//utils::DrawRect(m_Hitbox);
 	utils::SetColor(Color4f{ 0.f, 0.776f, 1.f, 1.f });
 	utils::FillEllipse(m_PositionSecond.x, m_PositionSecond.y, 40.f, 40.f);
 	utils::SetColor(Color4f{ 0.133f, 0.776f, 0.267f, 1.f });
@@ -44,33 +45,47 @@ void Player::Update(float elapsedSec)
 		m_Hitbox.left += m_Speed.x * elapsedSec;
 	}
 	
+	if (GhostActive == false)
+	{
+		if (m_IsLooking == LR::Right)
+		{
+			float Xlength{ m_PositionFirst.x - 50 - m_PositionSecond.x };
+			m_PositionSecond.x += Xlength * elapsedSec * 5;
+		}
+		else if (m_IsLooking == LR::Left)
+		{
+			float Xlength{ m_PositionFirst.x + 50 - m_PositionSecond.x };
+			m_PositionSecond.x += Xlength * elapsedSec * 5;
+		}
 
-	if (m_IsLooking == LR::Right)
-	{
-		float Xlength{ m_PositionFirst.x - 50 - m_PositionSecond.x };
-		m_PositionSecond.x += Xlength  * elapsedSec * 5;
-	}
-	else if(m_IsLooking == LR::Left)
-	{
-		float Xlength{ m_PositionFirst.x + 50 - m_PositionSecond.x };
-		m_PositionSecond.x += Xlength * elapsedSec * 5;
+		Cooldown = 2.f;
 	}
 
 	if (Falling)
 	{
+		InGhost();
+
 		m_Hitbox.bottom += m_Speed.y;
 
-		m_PositionSecond.y = LastPositions[PREVIOUS_POINTS - 1].y;
+		if (GhostActive == false)
+		{
+			m_PositionSecond.y = LastPositions[PREVIOUS_POINTS - 1].y;
+		}
 		
 		m_Speed.y -= 9.f * elapsedSec;
 	}
 	else
 	{
-		m_PositionSecond.y = LastPositions[PREVIOUS_POINTS - 1].y;
+		if (GhostActive == false)
+		{
+			m_PositionSecond.y = LastPositions[PREVIOUS_POINTS - 1].y;
+		}
 		m_Speed.y = 0.f;
 		m_Jump = true;
 	}
 	
+	if (GhostActive) Cooldown -= elapsedSec;
+
 }
 
 
@@ -79,10 +94,15 @@ void Player::KeyDownEvent(const SDL_KeyboardEvent& e)
 	switch(e.keysym.sym)
 	{
 	case SDLK_SPACE:
-		if (m_Jump == true)
+		if (m_Jump)
 		{
 			m_Speed.y = 5.f;
 			m_Jump = false;
+			Falling = true;
+		}
+		if (doubleJump == true)
+		{
+			m_Speed.y = 5.f;
 			Falling = true;
 		}
 		break;
@@ -94,6 +114,25 @@ void Player::KeyDownEvent(const SDL_KeyboardEvent& e)
 		IsRight = true;
 		m_IsLooking = LR::Right;
 		break;
+	case SDLK_q:
+		
+		if (GhostActive == false)
+		{
+			m_PositionSecond = m_PositionFirst;
+			GhostActive = true;
+		}
+		
+		break;
+	case SDLK_e:
+
+		if (GhostActive)
+		{
+			if (Cooldown < 0)
+			{
+				GhostActive = false;
+				doubleJump = false;
+			}
+		}
 	}
 }
 void Player::KeyUpEvent(const SDL_KeyboardEvent& e)
@@ -157,5 +196,22 @@ void Player::HitY(float given_Y)
 	else
 	{
 		Falling = true;
+	}
+}
+
+void Player::InGhost()
+{
+	if (GhostActive)
+	{
+		const Rectf Ghost{ m_PositionSecond.x - 40.f, m_PositionSecond.y - 40.f, 80.f, 80.f };
+
+		if (utils::IsOverlapping(m_Hitbox, Ghost))
+		{
+			doubleJump = true;
+		}
+		else
+		{
+			doubleJump = false;
+		}
 	}
 }

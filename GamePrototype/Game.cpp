@@ -20,7 +20,7 @@ Game::~Game( )
 void Game::Initialize( )
 {
 	m_Player = new Player{};
-	SVGParser::GetVerticesFromSvgFile("LevelTowerV5.svg", m_SolidHitboxes);
+	SVGParser::GetVerticesFromSvgFile("LevelTowerV8.svg", m_SolidHitboxes);
 }
 
 void Game::Cleanup( )

@@ -19,6 +19,7 @@ public:
 	void KeyUpEvent(const SDL_KeyboardEvent& e);
 	void HitX(float given_X);
 	void HitY(float given_Y);
+	void InGhost();
 
 	Point2f GetPos();
 	Rectf GetHitbox();
@@ -38,5 +39,8 @@ private:
 	Point2f LastPositions[PREVIOUS_POINTS];
 	Rectf m_Hitbox;
 	bool Falling;
+	bool GhostActive;
+	float Cooldown;
+	bool doubleJump;
 };
 
